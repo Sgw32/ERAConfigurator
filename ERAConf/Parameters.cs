@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
 using KBCsv;
+using System.Windows.Forms;
 
 namespace ERAConf
 {
@@ -22,10 +23,12 @@ namespace ERAConf
         private static Parameters instance;
         public SortedDictionary<String, ParamValue> parameters;
         public SortedDictionary<String, ParamValue> baseParameters;
+        public SortedDictionary<String, ComboBox> regCBs;
         private Parameters() 
         {
             parameters = new SortedDictionary<String, ParamValue>();
             baseParameters = new SortedDictionary<String, ParamValue>();
+            regCBs = new SortedDictionary<String, ComboBox>();
         }
 
         public static Parameters Instance
@@ -62,7 +65,7 @@ namespace ERAConf
         {
             try 
             {
-                using (var streamWriter = new StreamWriter("param_base.csv"))
+                using (var streamWriter = new StreamWriter(System.IO.Path.GetDirectoryName(Application.ExecutablePath) + "/param_base.csv"))
                 using (var writer = new CsvWriter(streamWriter))
                 {
                     writer.ForceDelimit = true;
@@ -84,7 +87,7 @@ namespace ERAConf
         {
             try
             {
-                using (var streamReader = new StreamReader("param_base.csv"))
+                using (var streamReader = new StreamReader(System.IO.Path.GetDirectoryName(Application.ExecutablePath)+"/param_base.csv"))
                 using (var reader = new CsvReader(streamReader))
                 {
                     var dataRecord = reader.ReadDataRecord();
@@ -158,11 +161,31 @@ namespace ERAConf
                     {
                         String line = sr.ReadLine();
                         //Remove comment
+
                         int cmt = line.IndexOf('#');
                         if (cmt > -1)
                         {
-                            line.Remove(cmt);
+                            //line.Remove(cmt);
+                            cmt = line.IndexOf("DATA:");
+                            if (cmt > -1)
+                            {
+                                line = line.Remove(0, cmt+5);
+                                cmt = line.IndexOf(':');
+                                if (cmt > -1)
+                                {
+                                    //line.Remove(0, line.Length - cmt);
+                                    String name = line.Substring(0, cmt);
+                                    String defValue = line.Substring(cmt+1);
+                                    int selectId = 0;
+                                    int.TryParse(defValue, out selectId);
+                                    if (regCBs.ContainsKey(name))
+                                    {
+                                        regCBs[name].SelectedIndex = selectId;
+                                    }
+                                }
+                            }
                         }
+
                         int zap = line.IndexOf(',');
                         if (zap > -1)
                         {
@@ -188,7 +211,10 @@ namespace ERAConf
             {
                 using (StreamWriter sr = new StreamWriter(file))
                 {
-                    sr.WriteLine("#NOTE:");
+                    foreach (KeyValuePair<String, ComboBox> val in regCBs)
+                    {
+                        sr.WriteLine("#DATA:" + val.Value.Name + ":" + val.Value.SelectedIndex.ToString());
+                    }
                     foreach (KeyValuePair<String, ParamValue> val in parameters)
                     {
                         sr.WriteLine(val.Key + "," + val.Value.value);
