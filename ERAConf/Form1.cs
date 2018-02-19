@@ -41,8 +41,8 @@ namespace ERAConf
 
         private void updateListBox()
         {
-            listBox1.Items.Clear();
-            SortedDictionary<String, ParamValue> baseP = Parameters.Instance.baseParameters;
+            //listBox1.Items.Clear();
+            /*SortedDictionary<String, ParamValue> baseP = Parameters.Instance.baseParameters;
             if (baseP.Count>0)
             {
                 foreach (KeyValuePair<String, ParamValue> val in baseP)
@@ -53,7 +53,7 @@ namespace ERAConf
             foreach (String l in listBox1.Items)
             {
                 listBox2.Items.Add(l);
-            }
+            }*/
         }
 
         private void updateEditListBox()
@@ -139,7 +139,7 @@ namespace ERAConf
         private void Form1_Load(object sender, EventArgs e)
         {
             writeLock = true;
-            listBox1.Items.Clear();
+            //listBox1.Items.Clear();
             listBox2.Items.Clear();
             comboBox1.Items.Clear();
             comboBox2.Items.Clear();
@@ -158,7 +158,7 @@ namespace ERAConf
 
             DependentParameters.Instance.updateCombos.Add(comboBox7);
             DependentParameters.Instance.updateCombos.Add(comboBox9);
-            Parameters.Instance.readParameters();
+            //Parameters.Instance.readParameters(); 
             updateListBox();
             makeACTLS();
             APCtrlWorker.Instance.fCtl = this.Controls;
@@ -187,6 +187,9 @@ namespace ERAConf
             APCtrlWorker.Instance.taggedEdits["BATTH_THR_MAX"] = "textBox30";
             APCtrlWorker.Instance.transferValuesToTextBoxes();
             writeLock = false;
+            Parameters.Instance.loadEditFromFile("base.param");
+            updateEditListBox();
+            APCtrlWorker.Instance.transferValuesToTextBoxes();
         }
 
         private void loadVariants()
@@ -199,17 +202,17 @@ namespace ERAConf
 
         private void button3_Click(object sender, EventArgs e)
         {
-            Parameters.Instance.removeBaseParameter(listBox1.SelectedValue.ToString());
-            updateListBox();
+          //  Parameters.Instance.removeBaseParameter(listBox1.SelectedValue.ToString());
+          //  updateListBox();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            String description = textBox4.Text;
+            /*String description = textBox4.Text;
             String defaultValue = textBox3.Text;
             String name = textBox2.Text;
             Parameters.Instance.addBaseParameter(name, defaultValue, description);
-            updateListBox();
+            updateListBox();*/
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -229,13 +232,13 @@ namespace ERAConf
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            String name = listBox1.SelectedItem.ToString();
+            /*String name = listBox1.SelectedItem.ToString();
             ParamValue val = Parameters.Instance.baseParameters[listBox1.SelectedItem.ToString()];
             String description = val.description;
             String defaultValue = val.defaultValue;
             textBox4.Text = description;
             textBox3.Text = defaultValue;
-            textBox2.Text = name;
+            textBox2.Text = name;*/
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -584,6 +587,23 @@ namespace ERAConf
         private void textBox19_TextChanged(object sender, EventArgs e)
         {
             changeTextBox(textBox19);
+        }
+
+        private void tabPage3_Click(object sender, EventArgs e)
+        {
+            Parameters.Instance.loadEditFromFile("base.param");
+            updateEditListBox();
+            APCtrlWorker.Instance.transferValuesToTextBoxes();
+        }
+
+        private void создатьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void newToolStripButton_Click(object sender, EventArgs e)
+        {
+            создатьToolStripMenuItem_Click(this, e);
         }
     }
 }
